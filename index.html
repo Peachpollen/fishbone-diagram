@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Fishbone Diagram</title>
+    <script src="https://unpkg.com/gojs/release/go.js"></script>
+    <style>
+        #myDiagramDiv {
+            width: 100%;
+            height: 600px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div id="myDiagramDiv"></div>
+    <script>
+        function init() {
+            var $ = go.GraphObject.make;
+
+            var myDiagram = $(go.Diagram, "myDiagramDiv", {
+                initialContentAlignment: go.Spot.Center,
+                "undoManager.isEnabled": true
+            });
+
+            myDiagram.nodeTemplate =
+                $(go.Node, "Auto",
+                    $(go.Shape, "RoundedRectangle", { strokeWidth: 0 },
+                        new go.Binding("fill", "color")),
+                    $(go.TextBlock, { margin: 8 },
+                        new go.Binding("text", "key"))
+                );
+
+            myDiagram.model = new go.GraphLinksModel(
+                [
+                    { key: "Root Cause Analysis", color: "lightblue" },
+                    { key: "People", color: "lightgreen" },
+                    { key: "Processes", color: "lightgreen" },
+                    { key: "Lack of training", color: "lightyellow" },
+                    { key: "High workload", color: "lightyellow" },
+                    { key: "Complex procedures", color: "lightyellow" },
+                    { key: "Poor documentation", color: "lightyellow" }
+                ],
+                [
+                    { from: "Root Cause Analysis", to: "People" },
+                    { from: "Root Cause Analysis", to: "Processes" },
+                    { from: "People", to: "Lack of training" },
+                    { from: "People", to: "High workload" },
+                    { from: "Processes", to: "Complex procedures" },
+                    { from: "Processes", to: "Poor documentation" }
+                ]);
+
+            // Make nodes clickable
+            myDiagram.addDiagramListener("ObjectSingleClicked",
+                function (e) {
+                    var part = e.subject.part;
+                    if (!(part instanceof go.Link)) alert("Clicked on " + part.data.key);
+                });
+        }
+        init();
+    </script>
+</body>
+</html>
